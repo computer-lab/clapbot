@@ -38,6 +38,8 @@ def clap(tweet,user):
   first_word = words[0]
   if first_word[0] == '@':
     user = first_word
+  if first_word[0] == '-':
+    first_word = first_word.replace('-','@')
   clap_tweet = first_word
   words.pop(0)
   for w in words:
