@@ -33,20 +33,20 @@ def listen(consumer_key, consumer_secret, access_key, access_secret,since_id):
 
 def clap(tweet,user):
 	clap_emoji = u"\U0001F44F"
-	tweet = tweet.replace('@clapbot','').strip()
+	tweet = tweet.lower().replace('@clapbot','').strip()
 	words = tweet.split(' ')
 	first_word = words[0]
 	words.pop(0)
 	clap_tweet = first_word
 	for w in words:
 		clap_tweet = clap_tweet + ' ' + clap_emoji + ' ' + w
+	clap_tweet = clap_tweet + ' ' + clap_emoji
 	if len(clap_tweet) < 141:
 		return clap_tweet + ' @' + user
 	else:
-		return 'cannot clap dat'
+		return 'cannot ' + clap_emoji + ' clap'  + clap_emoji + ' dat @' + user
 
 
-print clap('@clapbot i love every single gatorade flavor','mrbotsnet')
 consumer_key, consumer_secret, access_key, access_secret = creds()
 seen = []
 log = open('log.txt','r')
@@ -69,21 +69,37 @@ while len(seen) > 0:
     print 'no new mentions, taking a 420 second break'
   else:
     for i in mentions:
-      request_id = i.id_str
-      seen.append(int(request_id)+1)
-      log.write(request_id + '\n')
-      json_tweet = json.dumps(i._json)
-      json_tweet = json.loads(json_tweet)
-      print json_tweet['user']['name']
-      screen_name = json_tweet['user']['name']
-      tweet = clap(i.text,screen_name)
-      api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
+      print i.user.screen_name
+      print i.text
+      sleep(50)
+      if i.user.screen_name <> 'ClapBot':
+        request_id = i.id_str
+        seen.append(int(request_id)+1)
+        log.write(request_id + '\n')
+        sender = i.user.screen_name
+        tweet = clap(i.text,sender)
+        api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
+        try:
+        	api.update_status(status=tweet)
+        	print 'tweeted '+tweet
+        	sleep(30)
+        except Exception:
+        	print 'couldnt tweet'
+        	sleep(30)
+        	pass
+  sleep(420)
+  print 'taking 420 second break'
+      # request_id = i.id_str
+      # seen.append(int(request_id)+1)
+      # log.write(request_id + '\n')
+      # sender = i.user.screen_name
+      # tweet = clap(i.text,sender)
+      # api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
       # try:
-
-      api.update_status(status=tweet)
-      print 'tweeted '+tweet
-      sleep(30)
-      # except Exception:
-      #   print 'couldnt tweet'
+      # 	api.update_status(status=tweet)
+      # 	print 'tweeted '+tweet
       #   sleep(30)
-      #   pass
+      # except Exception:
+      #  	print 'couldnt tweet'
+      #  	sleep(30)
+      #  	pass
