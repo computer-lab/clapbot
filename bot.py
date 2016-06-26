@@ -32,20 +32,24 @@ def listen(consumer_key, consumer_secret, access_key, access_secret,since_id):
   return mentions
 
 def clap(tweet,user):
-	clap_emoji = u"\U0001F44F"
-	tweet = tweet.lower().replace('@clapbot','').strip()
-	words = tweet.split(' ')
-	first_word = words[0]
-	words.pop(0)
-	clap_tweet = first_word
-	for w in words:
-		clap_tweet = clap_tweet + ' ' + clap_emoji + ' ' + w
-	clap_tweet = clap_tweet + ' ' + clap_emoji
-	if len(clap_tweet) < 141:
-		return clap_tweet + ' @' + user
-	else:
-		return 'cannot ' + clap_emoji + ' clap'  + clap_emoji + ' dat @' + user
-
+  clap_emoji = u"\U0001F44F"
+  tweet = tweet.lower().replace('@clapbot','').strip()
+  words = tweet.split(' ')
+  first_word = words[0]
+  if first_word[0] == '@':
+    user = first_word
+  clap_tweet = first_word
+  words.pop(0)
+  for w in words:
+  	clap_tweet = clap_tweet + clap_emoji +  w
+  clap_tweet = clap_tweet + clap_emoji
+  if len(clap_tweet) < 141:
+    if clap_tweet[0] == '@':
+      return clap_tweet
+    else:
+      return clap_tweet + ' @' + user
+  else:
+  	return 'cannot' + clap_emoji + 'clap'  + clap_emoji + 'dat @' + user
 
 consumer_key, consumer_secret, access_key, access_secret = creds()
 seen = []
@@ -71,7 +75,6 @@ while len(seen) > 0:
     for i in mentions:
       print i.user.screen_name
       print i.text
-      sleep(50)
       if i.user.screen_name <> 'ClapBot':
         request_id = i.id_str
         seen.append(int(request_id)+1)
@@ -87,19 +90,3 @@ while len(seen) > 0:
         	print 'couldnt tweet'
         	sleep(30)
         	pass
-  sleep(420)
-  print 'taking 420 second break'
-      # request_id = i.id_str
-      # seen.append(int(request_id)+1)
-      # log.write(request_id + '\n')
-      # sender = i.user.screen_name
-      # tweet = clap(i.text,sender)
-      # api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
-      # try:
-      # 	api.update_status(status=tweet)
-      # 	print 'tweeted '+tweet
-      #   sleep(30)
-      # except Exception:
-      #  	print 'couldnt tweet'
-      #  	sleep(30)
-      #  	pass
