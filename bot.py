@@ -92,25 +92,10 @@ while len(seen) > 0:
     pass
   if len(mentions) < 1:
     sleep(42.0)
-    print 'no new mentions, taking a 420 second break'
+    print 'no new mentions, taking a 42.0 second break'
   else:
     for i in mentions:
       if i.user.screen_name <> 'ClapBot':
-        request_id = i.id_str
-        seen.append(int(request_id)+1)
-        log.write(request_id + '\n')
-        sender = i.user.screen_name
-        tweet = clap(i.text,sender)
-        api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
-        try:
-          api.update_status(status=tweet)
-          api.create_favorite(tweet_id)
-          print 'tweeted '+tweet
-          sleep(30)
-        except Exception:
-        	print 'couldnt tweet'
-        	sleep(30)
-        	pass
         process(i, i.user)
     for d in dms:
       process(d, d.sender)
