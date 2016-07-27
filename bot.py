@@ -29,7 +29,8 @@ def listen(consumer_key, consumer_secret, access_key, access_secret,since_id):
   auth.set_access_token(access_key, access_secret)
   api = tweepy.API(auth)
   mentions = api.mentions_timeline(count=200,since_id=since_id)
-  return mentions
+  dms = api.direct_messages(count=200,since_id=since_id)
+  return mentions, dms
 
 def clap(tweet,user):
   clap_emoji = u"\U0001F44F"
@@ -53,6 +54,25 @@ def clap(tweet,user):
   else:
   	return 'cannot' + clap_emoji + 'clap'  + clap_emoji + 'dat @' + user
 
+def process(i, user):
+  tweet_id = i.id
+  request_id = i.id_str
+  seen.append(int(request_id)+1)
+  log.write(request_id + '\n')
+  sender = user.screen_name
+  tweet = clap(i.text,sender)
+  api = twitter_api(consumer_key, consumer_secret, access_key, access_secret)
+  try:
+    api.update_status(status=tweet)
+    if hasattr(i, 'retweeted'):
+      api.create_favorite(tweet_id)
+    print 'tweeted '+tweet
+    sleep(30)
+  except Exception:
+    print 'couldnt tweet'
+    sleep(30)
+    pass
+
 consumer_key, consumer_secret, access_key, access_secret = creds()
 seen = []
 log = open('log.txt','r')
@@ -64,7 +84,7 @@ log = open('log.txt','ab')
 while len(seen) > 0:
   last_mention = max(seen)
   try:
-    mentions =  listen(consumer_key, consumer_secret, access_key, access_secret,last_mention)
+    mentions, dms =  listen(consumer_key, consumer_secret, access_key, access_secret,last_mention)
   except Exception as e:
     print str(e)
     print 'some sort of drama when listening'
@@ -75,7 +95,6 @@ while len(seen) > 0:
     print 'no new mentions, taking a 420 second break'
   else:
     for i in mentions:
-      tweet_id = i.id
       if i.user.screen_name <> 'ClapBot':
         request_id = i.id_str
         seen.append(int(request_id)+1)
@@ -92,3 +111,6 @@ while len(seen) > 0:
         	print 'couldnt tweet'
         	sleep(30)
         	pass
+        process(i, i.user)
+    for d in dms:
+      process(d, d.sender)
