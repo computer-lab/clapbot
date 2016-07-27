@@ -43,7 +43,7 @@ def clap(tweet,user):
   clap_tweet = first_word
   words.pop(0)
   for w in words:
-  	clap_tweet = clap_tweet + clap_emoji +  w
+  	clap_tweet = clap_tweet + " " + clap_emoji + " " +  w
   clap_tweet = clap_tweet + clap_emoji
   if len(clap_tweet) < 141:
     if clap_tweet[0] == '@':
@@ -68,10 +68,10 @@ while len(seen) > 0:
   except Exception as e:
     print str(e)
     print 'some sort of drama when listening'
-    sleep(420)
+    sleep(42.0)
     pass
   if len(mentions) < 1:
-    sleep(420)
+    sleep(42.0)
     print 'no new mentions, taking a 420 second break'
   else:
     for i in mentions:
